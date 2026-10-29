@@ -27,6 +27,7 @@
 
 import bpy
 import blf
+from .. import i18n
 from . preferences import get_preferences
 from . polling import app_minor_version
 
@@ -155,11 +156,11 @@ def draw_header(cls):
 
         states = []
         if cls.operator_passthrough:
-            states.append("PAUSED")
+            states.append(i18n.t("PAUSED"))
         if is_summoned:
-            states.append("RECALL")
+            states.append(i18n.t("RECALL"))
         if cls.pin_overlay:
-            states.append("PINNED")
+            states.append(i18n.t("PINNED"))
 
         blf.draw(0, " // ".join(states))
 
@@ -168,7 +169,7 @@ def draw_header(cls):
     else:
         blf.size(0, 24 * cls.dpi_scalar)
     blf.position(0, cls.overlay_x, cls.overlay_y, 0)
-    blf.draw(0, "ND — " + cls.bl_label)
+    blf.draw(0, "ND — " + i18n.t(cls.bl_label))
 
     cls.line_step = 0
 
@@ -243,7 +244,7 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
 
     if is_value is not None:
         reset_behaviour = get_preferences().overlay_reset_key_behaviour
-        blf.draw(0, "{} — [{}] to {}.".format(metadata_content, get_preferences().overlay_reset_key, "reset" if reset_behaviour == "RESET" else "unlock"))
+        blf.draw(0, "{} — [{}] to {}.".format(metadata_content, get_preferences().overlay_reset_key, i18n.t("reset") if reset_behaviour == "RESET" else i18n.t("unlock")))
     else:
         blf.draw(0, metadata_content)
 

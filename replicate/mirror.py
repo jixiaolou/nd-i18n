@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
@@ -89,7 +90,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -110,11 +111,11 @@ CTRL — Remove existing modifiers"""
         self.target_obj = get_real_active_object(context)
 
         if obj_is_curve(context.active_object) and self.geometry_mode:
-            self.report({'INFO'}, "The mirror across selected geometry feature cannot be used on curves")
+            self.report({'INFO'}, i18n.t("The mirror across selected geometry feature cannot be used on curves"))
             return {'CANCELLED'}
 
         if self.edit_mode and self.geometry_mode:
-            self.report({'INFO'}, "The mirror across selected geometry feature cannot be used in edit mode")
+            self.report({'INFO'}, i18n.t("The mirror across selected geometry feature cannot be used in edit mode"))
             return {'CANCELLED'}
 
         if ctx_min_objects_selected(context, 2):
@@ -302,9 +303,9 @@ CTRL — Remove existing modifiers"""
             unregister_axis_handler()
 
             if self.geometry_selection_type == 0:
-                self.report({'INFO'}, "Ensure only a single vertex, or exactly 3 vertices are selected.")
+                self.report({'INFO'}, i18n.t("Ensure only a single vertex, or exactly 3 vertices are selected."))
             else:
-                self.report({'INFO'}, "Ensure only a single edge or face is selected.")
+                self.report({'INFO'}, i18n.t("Ensure only a single edge or face is selected."))
 
             return {'CANCELLED'}
 
@@ -430,24 +431,24 @@ def draw_text_callback(self):
         selection_types = ['Vertex', 'Edge', 'Face']
         draw_hint(
             self,
-            f"Selection Type [S, 1, 2, 3]: {selection_types[self.geometry_selection_type]}",
+            i18n.t("Selection Type [S, 1, 2, 3]") + f": {selection_types[self.geometry_selection_type]}",
             self.list_options_str(selection_types))
     elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
         axes = ['X', 'Y', 'Z']
         draw_hint(
             self,
-            f"Axis [A]: {axes[self.axis]}",
+            i18n.t("Axis [A]") + f": {axes[self.axis]}",
             self.list_options_str(axes))
 
         draw_hint(
             self,
-            f"Flipped [F]: {self.yes_no_str(self.flip)}",
-            "Flip the mirror direction")
+            i18n.t("Flipped [F]") + f": {self.yes_no_str(self.flip)}",
+            i18n.t("Flip the mirror direction"))
 
         draw_hint(
             self,
-            f"Symmetrize [S]: {self.yes_no_str(self.symmetrize)}",
-            "Immediately apply the mirror modifier")
+            i18n.t("Symmetrize [S]") + f": {self.yes_no_str(self.symmetrize)}",
+            i18n.t("Immediately apply the mirror modifier"))
 
 
 def register():

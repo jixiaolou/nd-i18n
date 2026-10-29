@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -171,7 +172,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -382,7 +383,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"U Points: {self.lattice_points_u}",
+        i18n.t("U Points") + f": {self.lattice_points_u}",
         "(±1)",
         active=(self.uniform or self.key_no_modifiers),
         alt_mode=False,
@@ -391,7 +392,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"V Points: {self.lattice_points_v}",
+        i18n.t("V Points") + f": {self.lattice_points_v}",
         "Alt (±1)",
         active=(self.uniform or self.key_alt),
         alt_mode=False,
@@ -400,7 +401,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"W Points: {self.lattice_points_w}",
+        i18n.t("W Points") + f": {self.lattice_points_w}",
         "Ctrl (±1)",
         active=(self.uniform or self.key_ctrl),
         alt_mode=False,
@@ -409,13 +410,13 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Uniform [U]: {self.yes_no_str(self.uniform)}",
-        "Adjust all points uniformly")
+        i18n.t("Uniform [U]") + f": {self.yes_no_str(self.uniform)}",
+        i18n.t("Adjust all points uniformly"))
 
     interpolation_mode = self.interpolation_modes[self.interpolation_mode]
     draw_hint(
         self,
-        f"Interpolation Mode [M]: {self.interpolation_labels[interpolation_mode]}",
+        i18n.t("Interpolation Mode [M]") + f": {self.interpolation_labels[interpolation_mode]}",
         self.list_options_str(self.interpolation_labels.values()))
 
 

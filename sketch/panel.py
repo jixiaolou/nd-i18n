@@ -30,6 +30,7 @@ import bmesh
 from math import radians
 from mathutils import Matrix
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
@@ -114,7 +115,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.xray_mode = False
@@ -263,7 +264,7 @@ def draw_text_callback(self):
     if self.stage == 1:
         draw_property(
             self,
-            f"Inset Amount: {(self.inset * self.display_unit_scale):.2f}{self.unit_suffix}",
+            i18n.t("Inset Amount") + f": {(self.inset * self.display_unit_scale):.2f}{self.unit_suffix}",
             self.unit_step_hint,
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -272,13 +273,13 @@ def draw_text_callback(self):
 
         draw_hint(
             self,
-            f"Individual Faces [F]: {self.yes_no_str(self.individual)}",
-            "Inset each face individually")
+            i18n.t("Individual Faces [F]") + f": {self.yes_no_str(self.individual)}",
+            i18n.t("Inset each face individually"))
 
     draw_hint(
         self,
-        f"Exclusive View [E]: {self.yes_no_str(self.xray_mode)}",
-        "Show the target object in front of all other objects")
+        i18n.t("Exclusive View [E]") + f": {self.yes_no_str(self.xray_mode)}",
+        i18n.t("Show the target object in front of all other objects"))
 
 
 def register():

@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians, degrees
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -97,7 +98,7 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.fast_apply = event.shift
@@ -179,7 +180,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Angle: {self.angle:.2f}°",
+        i18n.t("Angle") + f": {self.angle:.2f}°",
         self.generate_step_hint(self.base_angle_factor, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -188,8 +189,8 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Auto Smooth [A]: {self.yes_no_str(self.commit_auto_smooth)}",
-        "Set auto smooth angle to 180° on completion")
+        i18n.t("Auto Smooth [A]") + f": {self.yes_no_str(self.commit_auto_smooth)}",
+        i18n.t("Set auto smooth angle to 180° on completion"))
 
 
 def register():

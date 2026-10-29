@@ -30,6 +30,7 @@ import bmesh
 from .. __init__ import bl_info
 from .. lib.objects import is_planar, get_real_active_object
 from . ops import build_icon_lookup_table
+from .. import i18n
 from .. lib.addons import is_addon_enabled
 from .. lib.polling import ctx_edit_mode
 
@@ -74,12 +75,12 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
     def draw_no_predictions(self, context):
         layout = self.layout
-        layout.label(text="No predictions available", icon='GHOST_DISABLED')
+        layout.label(text=i18n.t("No predictions available"), icon='GHOST_DISABLED')
 
 
     def draw_no_active_target(self, context):
         layout = self.layout
-        layout.label(text="No active target object selected", icon='RESTRICT_SELECT_OFF')
+        layout.label(text=i18n.t("No active target object selected"), icon='RESTRICT_SELECT_OFF')
 
         return NO_SECTION_COUNT
 
@@ -119,13 +120,13 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if all([obj.display_type == 'WIRE' for obj in context.selected_objects]):
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
-            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
+            layout.operator("nd.swap_solver", text=i18n.t("Swap Solver (Booleans)"), icon=icons['nd.swap_solver'])
 
             return SECTION_COUNT
 
-        layout.operator("nd.bool_vanilla", text="Difference", icon=icons['nd.bool_vanilla+DIFFERENCE']).mode = 'DIFFERENCE'
-        layout.operator("nd.bool_vanilla", text="Union", icon=icons['nd.bool_vanilla+UNION']).mode = 'UNION'
-        layout.operator("nd.bool_vanilla", text="Intersect", icon=icons['nd.bool_vanilla+INTERSECT']).mode = 'INTERSECT'
+        layout.operator("nd.bool_vanilla", text=i18n.t("Difference"), icon=icons['nd.bool_vanilla+DIFFERENCE']).mode = 'DIFFERENCE'
+        layout.operator("nd.bool_vanilla", text=i18n.t("Union"), icon=icons['nd.bool_vanilla+UNION']).mode = 'UNION'
+        layout.operator("nd.bool_vanilla", text=i18n.t("Intersect"), icon=icons['nd.bool_vanilla+INTERSECT']).mode = 'INTERSECT'
         layout.operator("nd.bool_slice", icon=icons['nd.bool_slice'])
         layout.operator("nd.bool_inset", icon=icons['nd.bool_inset'])
         layout.separator()
@@ -258,7 +259,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.separator()
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
-            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
+            layout.operator("nd.swap_solver", text=i18n.t("Swap Solver (Booleans)"), icon=icons['nd.swap_solver'])
             layout.operator("nd.duplicate_utility", icon=icons['nd.duplicate_utility'])
 
             return SECTION_COUNT
@@ -305,7 +306,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if all([obj.display_type == 'WIRE' for obj in context.selected_objects]):
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
-            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
+            layout.operator("nd.swap_solver", text=i18n.t("Swap Solver (Booleans)"), icon=icons['nd.swap_solver'])
 
             return SECTION_COUNT
 
@@ -313,8 +314,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("nd.triangulate", icon=icons['nd.triangulate'])
         layout.separator()
         layout.operator("nd.name_sync", icon=icons['nd.name_sync'])
-        layout.operator("nd.set_lod_suffix", text="Low LOD", icon=icons['nd.set_lod_suffix+LOW']).mode = 'LOW'
-        layout.operator("nd.set_lod_suffix", text="High LOD", icon=icons['nd.set_lod_suffix+HIGH']).mode = 'HIGH'
+        layout.operator("nd.set_lod_suffix", text=i18n.t("Low LOD"), icon=icons['nd.set_lod_suffix+LOW']).mode = 'LOW'
+        layout.operator("nd.set_lod_suffix", text=i18n.t("High LOD"), icon=icons['nd.set_lod_suffix+HIGH']).mode = 'HIGH'
         layout.separator()
         layout.operator("nd.smooth", icon=icons['nd.smooth'])
         layout.operator("nd.wn", icon=icons['nd.wn'])

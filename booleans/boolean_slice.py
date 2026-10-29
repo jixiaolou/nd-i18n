@@ -27,6 +27,7 @@
 
 import bpy
 from .. lib.preferences import get_preferences
+from .. import i18n
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object, configure_object_as_util, get_objects_in_hierarchy
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode, app_minor_version
@@ -51,7 +52,7 @@ ALT — Do not clean the reference object's mesh"""
 
     def execute(self, context):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'

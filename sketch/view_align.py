@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.viewport import set_3d_cursor
@@ -69,7 +70,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.xray_mode = False
@@ -226,9 +227,9 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         if self.has_invalid_selection(context):
             self.clean_up(context)
             if self.selection_type == 0:
-                self.report({'INFO'}, "Ensure only a single vertex, or exactly 3 vertices are selected.")
+                self.report({'INFO'}, i18n.t("Ensure only a single vertex, or exactly 3 vertices are selected."))
             else:
-                self.report({'INFO'}, "Ensure only a single edge or face is selected.")
+                self.report({'INFO'}, i18n.t("Ensure only a single edge or face is selected."))
             return
 
         self.prepare_view_align(context)
@@ -261,13 +262,13 @@ def draw_text_callback(self):
     selection_types = ['Vertex', 'Edge', 'Face']
     draw_hint(
         self,
-        f"Selection Type [S, 1, 2, 3]: {selection_types[self.selection_type]}",
+        i18n.t("Selection Type [S, 1, 2, 3]") + f": {selection_types[self.selection_type]}",
         self.list_options_str(selection_types))
 
     draw_hint(
         self,
-        f"Exclusive View [E]: {self.yes_no_str(self.xray_mode)}",
-        "Show the target object in front of all other objects")
+        i18n.t("Exclusive View [E]") + f": {self.yes_no_str(self.xray_mode)}",
+        i18n.t("Show the target object in front of all other objects"))
 
 
 def register():

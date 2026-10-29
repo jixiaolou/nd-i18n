@@ -28,6 +28,7 @@
 import bpy
 import inspect
 from .. lib.objects import get_real_active_object
+from .. import i18n
 from .. lib.polling import ctx_obj_mode, obj_exists, list_gt, app_minor_version
 from .. lib.node_groups import node_input_identifiers, get_node_input, set_node_input, get_node_input_attribute_state, set_node_input_attribute_state, node_input_variable_path, add_node_input_driver, remove_node_input_driver
 
@@ -145,7 +146,7 @@ ALT — Override util references on all sync'd objects"""
 
     def invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         valid_objects = self.get_valid_objects(context, context.active_object.type)
@@ -158,7 +159,7 @@ ALT — Override util references on all sync'd objects"""
         self.override_utils = event.alt
 
         if not self.clear_drivers and len(valid_objects) == 1:
-            self.report({'INFO'}, "At least two objects need to be selected in order to sync modifiers.")
+            self.report({'INFO'}, i18n.t("At least two objects need to be selected in order to sync modifiers."))
             return {'CANCELLED'}
 
         if self.clear_drivers:

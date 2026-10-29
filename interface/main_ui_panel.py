@@ -34,6 +34,7 @@ from . import ops
 from . common import create_box, render_ops
 from .. lib.preferences import get_preferences
 from .. lib.polling import app_minor_version
+from .. import i18n
 
 
 op_sections = [
@@ -140,7 +141,7 @@ class ND_OT_install_asset_lib(bpy.types.Operator):
 
     def execute(self, context):
         if app_minor_version() < (4, 5):
-            self.report({'WARNING'}, "ND Asset Library can only be installed in Blender 4.5 or later.")
+            self.report({'WARNING'}, i18n.t("ND Asset Library can only be installed in Blender 4.5 or later."))
             return {'CANCELLED'}
 
         asset_path = get_ND_asset_library_path()
@@ -154,11 +155,11 @@ class ND_OT_install_asset_lib(bpy.types.Operator):
 
             get_preferences().hide_asset_library_install_prompt = True
 
-            self.report({'INFO'}, "ND Asset Library installed successfully.")
+            self.report({'INFO'}, i18n.t("ND Asset Library installed successfully."))
 
             return {'FINISHED'}
 
-        self.report({'WARN'}, "ND Asset Library installation failed.")
+        self.report({'WARN'}, i18n.t("ND Asset Library installation failed."))
 
         return {'CANCELLED'}
 
@@ -171,7 +172,7 @@ class ND_OT_install_asset_lib_ignore(bpy.types.Operator):
 
     def execute(self, context):
         get_preferences().hide_asset_library_install_prompt = True
-        self.report({'INFO'}, "ND Asset Library installation prompt hidden.")
+        self.report({'INFO'}, i18n.t("ND Asset Library installation prompt hidden."))
         return {'FINISHED'}
 
 
@@ -190,11 +191,11 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         if not get_preferences().hide_asset_library_install_prompt and app_minor_version() >= (4, 5):
             box = layout.box()
             row = box.row()
-            row.label(text="Install the ND Asset Library?", icon='ASSET_MANAGER')
+            row.label(text=i18n.t("Install the ND Asset Library?"), icon='ASSET_MANAGER')
             row = box.row(align=True)
             row.scale_y = 1.5
-            row.operator("nd.install_asset_lib", text="Install")
-            row.operator("nd.install_asset_lib_ignore", text="Ignore")
+            row.operator("nd.install_asset_lib", text=i18n.t("Install"))
+            row.operator("nd.install_asset_lib_ignore", text=i18n.t("Ignore"))
 
         row = layout.column()
         row.operator("nd.toggle_sections")

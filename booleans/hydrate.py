@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -140,7 +141,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Collection: {self.collection_names[self.active_collection]}",
+        i18n.t("Collection") + f": {self.collection_names[self.active_collection]}",
         "Where to place the new object...",
         active=True,
         mouse_value=True,
@@ -148,8 +149,8 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Clear Parent [C]: {self.yes_no_str(self.clear_parent)}",
-        "Unparent the new object from the original target object")
+        i18n.t("Clear Parent [C]") + f": {self.yes_no_str(self.clear_parent)}",
+        i18n.t("Unparent the new object from the original target object"))
 
 
 def register():

@@ -29,6 +29,7 @@ import bpy
 from math import radians, degrees, copysign
 from random import random, uniform, randrange
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -157,7 +158,7 @@ class ND_OT_flare(BaseOperator):
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.summoned = False
@@ -184,7 +185,7 @@ class ND_OT_flare(BaseOperator):
             existing_lights = [light for light in self.empty.children if light.type == 'LIGHT' and light.data.type == 'AREA']
 
             if not existing_lights:
-                self.report({'ERROR'}, "Please select a valid Flare Lighting Rig")
+                self.report({'ERROR'}, i18n.t("Please select a valid Flare Lighting Rig"))
                 return {'CANCELLED'}
 
             self.lights = [(light, light.location[2], light.data.energy) for light in existing_lights]
@@ -317,7 +318,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Rotation: {self.rotation:.2f}",
+        i18n.t("Rotation") + f": {self.rotation:.2f}",
         self.generate_step_hint(15, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -326,7 +327,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Height Offset: {self.height_offset:.2f}",
+        i18n.t("Height Offset") + f": {self.height_offset:.2f}",
         self.generate_key_hint("Alt", self.generate_step_hint(1, 0.1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -335,7 +336,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Scale: {self.scale:.2f}",
+        i18n.t("Scale") + f": {self.scale:.2f}",
         self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
@@ -344,7 +345,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Energy Offset: {self.energy_offset:.1e}",
+        i18n.t("Energy Offset") + f": {self.energy_offset:.1e}",
         self.generate_key_hint("Ctrl + Alt", self.generate_step_hint("10k", "1k")),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,

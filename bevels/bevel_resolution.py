@@ -28,6 +28,7 @@
 import bpy
 from math import ceil, floor
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -222,14 +223,14 @@ def draw_text_callback(self):
     if is_factor_mode:
         draw_property(
             self,
-            f"Factor: {self.format_change_factor()}",
+            i18n.t("Factor") + f": {self.format_change_factor()}",
             self.generate_step_hint(1),
             active=self.key_no_modifiers,
             mouse_value=True)
     else:
         draw_property(
             self,
-            f"Offset: {self.segment_change}",
+            i18n.t("Offset") + f": {self.segment_change}",
             self.generate_step_hint(2, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -237,31 +238,31 @@ def draw_text_callback(self):
 
     draw_property(
             self,
-            f"Minimum: {self.minimum_segments}",
+            i18n.t("Minimum") + f": {self.minimum_segments}",
             self.generate_key_hint("Ctrl", self.generate_step_hint(1)),
             active=self.key_ctrl,
             mouse_value=True)
 
     draw_hint(
         self,
-        f"Mode [M]: {self.change_modes[self.change_mode].capitalize()}",
+        i18n.t("Mode [M]") + f": {self.change_modes[self.change_mode].capitalize()}",
         self.list_options_str(self.change_modes))
 
     draw_hint(
         self,
-        f"Affect [A]: {self.affect_modes[self.affect_mode].capitalize()}",
+        i18n.t("Affect [A]") + f": {self.affect_modes[self.affect_mode].capitalize()}",
         self.list_options_str(self.affect_modes))
 
     if is_factor_mode:
         draw_hint(
             self,
-            f"Rounding [R]: {self.round_modes[self.round_mode].capitalize()}",
+            i18n.t("Rounding [R]") + f": {self.round_modes[self.round_mode].capitalize()}",
             self.list_options_str(self.round_modes))
 
     draw_hint(
         self,
-        f"Enhanced Wireframe [E]: {self.yes_no_str(self.target_object.show_wire)}",
-        "Display the object's wireframe over solid shading")
+        i18n.t("Enhanced Wireframe [E]") + f": {self.yes_no_str(self.target_object.show_wire)}",
+        i18n.t("Display the object's wireframe over solid shading"))
 
 
 def register():

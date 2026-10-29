@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -126,7 +127,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -319,7 +320,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Extrusion: {(self.extrusion_length * self.display_unit_scale):.2f}{self.unit_suffix}",
+        i18n.t("Extrusion") + f": {(self.extrusion_length * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -328,7 +329,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Offset: {(self.offset * self.display_unit_scale):.2f}",
+        i18n.t("Offset") + f": {(self.offset * self.display_unit_scale):.2f}",
         self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
@@ -338,19 +339,19 @@ def draw_text_callback(self):
     weightings = ['Negative', 'Neutral', 'Positive']
     draw_hint(
         self,
-        f"Weighting [W]: {weightings[1 + round(self.weighting)]}",
+        i18n.t("Weighting [W]") + f": {weightings[1 + round(self.weighting)]}",
         self.list_options_str(weightings))
 
     axes = ['X', 'Y', 'Z']
     draw_hint(
         self,
-        f"Extrusion Axis [A]: {axes[self.axis]}",
+        i18n.t("Extrusion Axis [A]") + f": {axes[self.axis]}",
         self.list_options_str(axes))
 
     draw_hint(
         self,
-        f"Calculate Edges [E]: {self.yes_no_str(self.calculate_edges)}",
-        "Calculate the order of edges (affects normals)")
+        i18n.t("Calculate Edges [E]") + f": {self.yes_no_str(self.calculate_edges)}",
+        i18n.t("Calculate the order of edges (affects normals)"))
 
 
 def register():

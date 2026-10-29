@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.polling import ctx_obj_mode
@@ -123,8 +124,8 @@ def draw_text_callback(self):
     display_str = "Inverted" if self.inverted else "Normal"
     draw_hint(
         self,
-        f"Display [D]: {display_str}",
-        "Invert the object and viewport colors")
+        i18n.t("Display [D]") + f": {display_str}",
+        i18n.t("Invert the object and viewport colors"))
 
 
 def register():

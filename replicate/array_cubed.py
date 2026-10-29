@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -156,7 +157,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -276,7 +277,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Count: {self.axes[self.axis][IDX_COUNT]}",
+        i18n.t("Count") + f": {self.axes[self.axis][IDX_COUNT]}",
         self.generate_step_hint(1),
         active=self.key_no_modifiers,
         alt_mode=False,
@@ -286,7 +287,7 @@ def draw_text_callback(self):
     if self.axes[self.axis][IDX_RELATIVE]:
         draw_property(
             self,
-            f"Offset: {(self.axes[self.axis][IDX_OFFSET]):.2f}",
+            i18n.t("Offset") + f": {(self.axes[self.axis][IDX_OFFSET]):.2f}",
             self.generate_key_hint("Ctrl", self.generate_step_hint(1, 0.1)),
             active=self.key_ctrl,
             alt_mode=self.key_shift_ctrl,
@@ -295,7 +296,7 @@ def draw_text_callback(self):
     else:
         draw_property(
             self,
-            f"Offset: {(self.axes[self.axis][IDX_OFFSET] * self.display_unit_scale):.2f}{self.unit_suffix}",
+            i18n.t("Offset") + f": {(self.axes[self.axis][IDX_OFFSET] * self.display_unit_scale):.2f}{self.unit_suffix}",
             self.generate_key_hint("Ctrl", self.unit_step_hint),
             active=self.key_ctrl,
             alt_mode=self.key_shift_ctrl,
@@ -305,13 +306,13 @@ def draw_text_callback(self):
     displacement_str = "Relative" if self.axes[self.axis][IDX_RELATIVE] else "Constant"
     draw_hint(
         self,
-        f"Displacement [D]: {displacement_str}",
-        "Relative or constant displacement")
+        i18n.t("Displacement [D]") + f": {displacement_str}",
+        i18n.t("Relative or constant displacement"))
 
     axes = ['X', 'Y', 'Z']
     draw_hint(
         self,
-        f"Replication Axis [A]: {axes[self.axis]}",
+        i18n.t("Replication Axis [A]") + f": {axes[self.axis]}",
         self.list_options_str(axes))
 
 

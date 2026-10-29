@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians, degrees
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -128,7 +129,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -255,7 +256,7 @@ def draw_text_callback(self):
     if self.is_angular[self.methods[self.current_method]]:
         draw_property(
             self,
-            f"Angle: {self.angle:.2f}°",
+            i18n.t("Angle") + f": {self.angle:.2f}°",
             self.generate_step_hint(10, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -264,7 +265,7 @@ def draw_text_callback(self):
     else:
         draw_property(
             self,
-            f"Factor: {self.factor:.2f}",
+            i18n.t("Factor") + f": {self.factor:.2f}",
             self.generate_step_hint(0.1, 0.01),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -273,13 +274,13 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Method [M]: {self.methods[self.current_method].capitalize()}",
+        i18n.t("Method [M]") + f": {self.methods[self.current_method].capitalize()}",
         self.list_options_str(self.methods))
 
     axes = ['X', 'Y', 'Z']
     draw_hint(
         self,
-        f"Axis [A]: {axes[self.axis]}",
+        i18n.t("Axis [A]") + f": {axes[self.axis]}",
         self.list_options_str(axes))
 
 

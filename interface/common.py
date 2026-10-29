@@ -26,6 +26,11 @@
 # ---
 
 from .. lib.preferences import get_preferences
+from .. import i18n
+
+
+# Icon-only buttons: an empty label that is not a translatable message id.
+ICON_ONLY = ""
 
 
 def create_box(text, layout, props, prop_name, icons, shortcuts):
@@ -38,13 +43,14 @@ def create_box(text, layout, props, prop_name, icons, shortcuts):
         icon="TRIA_DOWN" if prop_active else "TRIA_RIGHT", icon_only=True, emboss=False
     )
 
-    row.label(text=text)
+    # Drawn by the add-on, not by Blender: the catalogue does not reach it.
+    row.label(text=i18n.t(text))
 
     for op, mode in shortcuts:
         if mode:
-            row.operator(op, icon=icons[f'{op}+{mode}'], text="").mode = mode
+            row.operator(op, icon=icons[f'{op}+{mode}'], text=ICON_ONLY).mode = mode
         else:
-            row.operator(op, icon=icons[op], text="")
+            row.operator(op, icon=icons[op], text=ICON_ONLY)
 
     if prop_active:
         return box.column()
@@ -69,6 +75,11 @@ def render_ops(ops, layout, new_row=True, use_separator=False):
             row.scale_y = 1.2
         else:
             row = layout
+
+        # A custom label bypasses the operator's own (translated) bl_label, so
+        # it has to be translated here.
+        if label:
+            label = i18n.t(label)
 
         if mode:
             row.operator(op, icon=icon, text=label).mode = mode

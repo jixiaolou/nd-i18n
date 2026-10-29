@@ -39,10 +39,18 @@ bl_info = {
 
 
 import bpy
+import importlib
 import rna_keymap_ui
 from bpy.types import AddonPreferences
 from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty, FloatProperty, FloatVectorProperty
 from bpy.app.handlers import persistent
+from . import i18n
+
+# Blender caches sub-modules across enable/disable cycles. Reloading here, before
+# NDPreferences is defined, means an edited i18n.py or a newly added locale file
+# is picked up on the next enable, and the enum items below are the fresh ones.
+importlib.reload(i18n)
+
 from . import lib
 from . import interface
 from . import booleans
@@ -82,8 +90,36 @@ registerables = (
 )
 
 
+def pref_language():
+    """The interface language selected in the ND preferences, or AUTO."""
+    try:
+        return bpy.context.preferences.addons[__name__].preferences.language
+    except (KeyError, AttributeError):
+        return i18n.AUTO
+
+
+def _on_language_changed(self, context):
+    i18n.activate(self.language)
+
+
+def _sync_language():
+    # A cheap timer: it makes a language change (and the value stored in the
+    # preferences at start-up) take effect without restarting Blender.
+    i18n.ensure_active(pref_language())
+    return 1.0
+
+
 class NDPreferences(AddonPreferences):
     bl_idname = __name__
+
+    language: EnumProperty(
+        name="Language",
+        description="Interface language used by ND. "
+        "The first entry follows Blender's own language",
+        items=i18n.LANGUAGE_ITEMS,
+        default=i18n.AUTO,
+        update=_on_language_changed,
+    )
 
     local_user_prefs_version: StringProperty(
         name="Local user preferences version",
@@ -456,11 +492,18 @@ class NDPreferences(AddonPreferences):
     )
 
     def draw(self, context):
+        # No-op unless the language changed; also makes the panel correct right
+        # after start-up, before the timer has run once.
+        i18n.ensure_active(self.language)
+
         layout = self.layout
 
         column = layout.column(align=True)
         row = column.row()
         row.prop(self, "tabs", expand=True)
+
+        language_row = layout.row(align=True)
+        language_row.prop(self, "language", text=i18n.t("Language"))
 
         box = layout.box()
 
@@ -498,7 +541,7 @@ class NDPreferences(AddonPreferences):
             pref_box = box.box()
             column = pref_box.column(align=True)
             row = column.row()
-            row.label(text=label)
+            row.label(text=i18n.t(label))
             column = pref_box.column(align=True)
             row = column.row()
             row.prop(self, prop, expand=expanded)
@@ -548,7 +591,7 @@ class NDPreferences(AddonPreferences):
         pref_box = box.box()
         column = pref_box.column(align=True)
         row = column.row()
-        row.label(text="Custom Overlay Options")
+        row.label(text=i18n.t("Custom Overlay Options"))
         for counter, pref in enumerate(overlay_prefs):
             if counter % 4 == 0:
                 row = column.row()
@@ -564,7 +607,7 @@ class NDPreferences(AddonPreferences):
 
         column = box.column(align=True)
         row = column.row()
-        row.label(text="Overlay Keybinds")
+        row.label(text=i18n.t("Overlay Keybinds"))
 
         for pref in overlay_prefs:
             column = box.column(align=True)
@@ -594,7 +637,7 @@ class NDPreferences(AddonPreferences):
     def draw_theme(self, box):
         column = box.column(align=True)
         row = column.row()
-        row.label(text="ND Theme Colors")
+        row.label(text=i18n.t("ND Theme Colors"))
 
         row.operator("nd.reset_theme")
 
@@ -637,13 +680,24 @@ def register():
 
     bpy.utils.register_class(NDPreferences)
 
+    i18n.load_locales()
+    i18n.activate(pref_language())
+
+    if not bpy.app.timers.is_registered(_sync_language):
+        bpy.app.timers.register(_sync_language, first_interval=0.5, persistent=True)
+
     for registerable in registerables:
         registerable.reload()
         registerable.register()
 
 
 def unregister():
+    if bpy.app.timers.is_registered(_sync_language):
+        bpy.app.timers.unregister(_sync_language)
+
     for registerable in registerables:
         registerable.unregister()
+
+    i18n.unregister_translations()
 
     bpy.utils.unregister_class(NDPreferences)

@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -98,7 +99,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -225,7 +226,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Segments: {self.segments}",
+        i18n.t("Segments") + f": {self.segments}",
         self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         mouse_value=True,

@@ -30,6 +30,7 @@ import bmesh
 from numpy.linalg import norm
 from bpy_extras.view3d_utils import region_2d_to_vector_3d, region_2d_to_origin_3d
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
@@ -71,7 +72,7 @@ class ND_OT_snap_align(BaseOperator):
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.hit_location = None

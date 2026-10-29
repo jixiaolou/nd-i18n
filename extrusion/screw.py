@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians, degrees
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -147,7 +148,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -330,7 +331,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Segments: {self.segments}",
+        i18n.t("Segments") + f": {self.segments}",
         self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -339,7 +340,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Angle: {self.angle:.2f}°",
+        i18n.t("Angle") + f": {self.angle:.2f}°",
         self.generate_key_hint("Alt", self.generate_step_hint(10, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -349,7 +350,7 @@ def draw_text_callback(self):
     if self.object_type == 'MESH':
         draw_property(
             self,
-            f"Offset: {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}",
+            i18n.t("Offset") + f": {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}",
             self.generate_key_hint("Ctrl", self.unit_step_hint),
             active=self.key_ctrl,
             alt_mode=self.key_shift_ctrl,
@@ -358,15 +359,15 @@ def draw_text_callback(self):
 
     axes = ['X', 'Y', 'Z']
 
-    draw_hint(self, f"Screw Axis [A]: {axes[self.axis]}", self.list_options_str(axes))
+    draw_hint(self, i18n.t("Screw Axis [A]") + f": {axes[self.axis]}", self.list_options_str(axes))
 
     if self.object_type == 'MESH':
-        draw_hint(self, f"Offset Axis [O]: {axes[self.offset_axis]}", self.list_options_str(axes))
+        draw_hint(self, i18n.t("Offset Axis [O]") + f": {axes[self.offset_axis]}", self.list_options_str(axes))
 
     draw_hint(
         self,
-        f"Flip Normals [F]: {self.yes_no_str(self.flip_normals)}",
-        "Flip the normals of the resulting mesh")
+        i18n.t("Flip Normals [F]") + f": {self.yes_no_str(self.flip_normals)}",
+        i18n.t("Flip the normals of the resulting mesh"))
 
 
 def register():

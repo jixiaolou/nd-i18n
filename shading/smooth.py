@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -155,7 +156,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Angle: {self.angle:.2f}°",
+        i18n.t("Angle") + f": {self.angle:.2f}°",
         self.generate_step_hint(self.base_angle_factor, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -165,8 +166,8 @@ def draw_text_callback(self):
     if app_minor_version() >= (4, 1):
         draw_hint(
             self,
-            f"Ignore Sharpness [S]: {self.yes_no_str(self.ignore_sharpness)}",
-            "Ignore edges marked as sharp")
+            i18n.t("Ignore Sharpness [S]") + f": {self.yes_no_str(self.ignore_sharpness)}",
+            i18n.t("Ignore edges marked as sharp"))
 
 
 def register():

@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.objects import get_real_active_object
+from .. import i18n
 from .. lib.polling import ctx_edit_mode, ctx_obj_mode, ctx_min_objects_selected, objs_are_mesh, obj_is_mesh, obj_edges_selected
 
 
@@ -49,11 +50,11 @@ class ND_OT_clear_edge_marks(bpy.types.Operator):
 
     def execute(self, context):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if ctx_edit_mode(context) and not obj_edges_selected(context.active_object):
-            self.report({'INFO'}, "No edges selected.")
+            self.report({'INFO'}, i18n.t("No edges selected."))
             return {'CANCELLED'}
 
         if ctx_obj_mode(context):

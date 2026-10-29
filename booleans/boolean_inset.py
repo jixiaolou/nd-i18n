@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -95,7 +96,7 @@ class ND_OT_bool_inset(BaseOperator):
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.base_thickness_factor = 0.01
@@ -222,7 +223,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Thickness: {(self.thickness * display_unit_scale):.2f}{self.unit_suffix}",
+        i18n.t("Thickness") + f": {(self.thickness * display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -232,8 +233,8 @@ def draw_text_callback(self):
     mode_str = "Outset" if self.outset else "Inset"
     draw_hint(
         self,
-        f"Mode [M]: {mode_str}",
-        "Create an Inset or Outset")
+        i18n.t("Mode [M]") + f": {mode_str}",
+        i18n.t("Create an Inset or Outset"))
 
 
 def register():

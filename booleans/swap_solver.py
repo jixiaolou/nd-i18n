@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version, obj_moddable
@@ -134,7 +135,7 @@ def draw_text_callback(self):
     draw_header(self)
 
     solver_str = self.solve_mode.capitalize() if self.solve_mode else "Mixed"
-    draw_hint(self, f"Solver [S]: {solver_str}", self.list_options_str(self.solver_options))
+    draw_hint(self, i18n.t("Solver [S]") + f": {solver_str}", self.list_options_str(self.solver_options))
 
 
 def register():

@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -177,11 +178,11 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if not obj_edges_selected(context.active_object):
-            self.report({'INFO'}, "No edges selected.")
+            self.report({'INFO'}, i18n.t("No edges selected."))
             return {'CANCELLED'}
 
         self.target_object = context.active_object
@@ -250,7 +251,7 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         bpy.ops.object.mode_set(mode='EDIT')
 
         if len(attribute_matches) > 1:
-            self.report({'INFO'}, "Multiple edge attributes are active, unable to continue operation.")
+            self.report({'INFO'}, i18n.t("Multiple edge attributes are active, unable to continue operation."))
             return {'CANCELLED'}
 
         if len(attribute_matches) == 1:
@@ -473,7 +474,7 @@ def draw_text_callback(self):
     if self.is_width_percent():
         draw_property(
             self,
-            f"Percentage: {self.percentage:.2f}%",
+            i18n.t("Percentage") + f": {self.percentage:.2f}%",
             self.generate_step_hint(10, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -491,7 +492,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Segments: {self.segments}",
+        i18n.t("Segments") + f": {self.segments}",
         self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -500,7 +501,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Profile: {self.profile:.2f}",
+        i18n.t("Profile") + f": {self.profile:.2f}",
         self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
@@ -509,28 +510,28 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Width Type [W]: {self.width_types[self.width_type].capitalize()}",
+        i18n.t("Width Type [W]") + f": {self.width_types[self.width_type].capitalize()}",
         self.list_options_str(self.width_types))
 
     draw_hint(
         self,
-        f"Harden Normals [H]: {self.yes_no_str(self.harden_normals)}",
-        "Match normals of new faces to adjacent faces")
+        i18n.t("Harden Normals [H]") + f": {self.yes_no_str(self.harden_normals)}",
+        i18n.t("Match normals of new faces to adjacent faces"))
 
     draw_hint(
         self,
-        f"Enhanced Wireframe [E]: {self.yes_no_str(self.target_object.show_wire)}",
-        "Display the object's wireframe over solid shading")
+        i18n.t("Enhanced Wireframe [E]") + f": {self.yes_no_str(self.target_object.show_wire)}",
+        i18n.t("Display the object's wireframe over solid shading"))
 
     draw_hint(
         self,
-        f"Clamp Overlap [C]: {self.yes_no_str(self.clamp_overlap)}",
-        "Clamp the width to avoid overlap")
+        i18n.t("Clamp Overlap [C]") + f": {self.yes_no_str(self.clamp_overlap)}",
+        i18n.t("Clamp the width to avoid overlap"))
 
     draw_hint(
         self,
-        f"Loop Slide [S]: {self.yes_no_str(self.loop_slide)}",
-        "Prefer sliding along edges to having even widths")
+        i18n.t("Loop Slide [S]") + f": {self.yes_no_str(self.loop_slide)}",
+        i18n.t("Prefer sliding along edges to having even widths"))
 
 
 def register():

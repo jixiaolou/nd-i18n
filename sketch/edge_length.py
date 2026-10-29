@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
@@ -98,7 +99,7 @@ class ND_OT_edge_length(BaseOperator):
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.revert_distance = False
@@ -121,7 +122,7 @@ class ND_OT_edge_length(BaseOperator):
         self.offset_distance = not self.single_edge
 
         if not self.single_edge and len([v.index for e in selected_edges for v in e.verts]) != len(selected_verts):
-            self.report({'INFO'}, "Selected edges must be disconnected.")
+            self.report({'INFO'}, i18n.t("Selected edges must be disconnected."))
             return {'CANCELLED'}
 
         self.selected_vertex_pairs = []
@@ -271,7 +272,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Distance: {(self.distance * self.display_unit_scale):.2f}{self.unit_suffix}",
+        i18n.t("Distance") + f": {(self.distance * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -280,13 +281,13 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Anchor [A]: {self.anchors[self.current_anchor].capitalize()}",
+        i18n.t("Anchor [A]") + f": {self.anchors[self.current_anchor].capitalize()}",
         self.list_options_str(self.anchors))
 
     distance_types = ['Absolute', 'Offset']
     draw_hint(
         self,
-        f"Distance Type [D]: {'Offset' if self.offset_distance else 'Absolute'}",
+        i18n.t("Distance Type [D]") + f": {'Offset' if self.offset_distance else 'Absolute'}",
         self.list_options_str(distance_types))
 
 

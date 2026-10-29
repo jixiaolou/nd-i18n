@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.objects import get_real_active_object
+from .. import i18n
 from .. lib.polling import ctx_edit_mode, ctx_obj_mode, ctx_min_objects_selected, objs_are_mesh, obj_is_mesh, obj_verts_selected
 
 
@@ -50,11 +51,11 @@ SHIFT — Do not remove empty vertex groups"""
 
     def execute(self, context):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if ctx_edit_mode(context) and not obj_verts_selected(context.active_object):
-            self.report({'INFO'}, "No vertices selected.")
+            self.report({'INFO'}, i18n.t("No vertices selected."))
             return {'CANCELLED'}
 
         # If we're in object mode simply remove all vertex groups and finish

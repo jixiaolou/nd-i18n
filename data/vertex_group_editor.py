@@ -30,6 +30,7 @@ import bmesh
 import random
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
@@ -107,7 +108,7 @@ class ND_OT_vertex_group_editor(BaseOperator):
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.target_object = context.active_object
@@ -127,12 +128,12 @@ class ND_OT_vertex_group_editor(BaseOperator):
         self.points = [self.world_matrix @ v.co for v in self.selected_verts]
 
         if len(self.selected_verts) == 0:
-            self.report({'INFO'}, "No vertices selected.")
+            self.report({'INFO'}, i18n.t("No vertices selected."))
             return {'CANCELLED'}
 
         self.vertex_groups = context.active_object.vertex_groups
         if not self.vertex_groups:
-            self.report({'INFO'}, "No vertex groups found, please create one.")
+            self.report({'INFO'}, i18n.t("No vertex groups found, please create one."))
             return {'CANCELLED'}
 
         self.vertex_group_index = 0
@@ -227,17 +228,17 @@ def draw_text_callback(self):
     draw_hint(
         self,
         f"Vertex Group ({self.vertex_group_index + 1}/{len(self.vertex_groups)}): {self.vertex_groups[self.vertex_group_index].name}",
-        "Cycle between vertex groups")
+        i18n.t("Cycle between vertex groups"))
 
     draw_hint(
         self,
-        f"Set Weight [S]: {self.yes_no_str(self.is_editing)}",
-        "Set the vertex weights for the selected group")
+        i18n.t("Set Weight [S]") + f": {self.yes_no_str(self.is_editing)}",
+        i18n.t("Set the vertex weights for the selected group"))
 
     if self.is_editing:
         draw_property(
             self,
-            f"Weight: {self.weight:.2f}",
+            i18n.t("Weight") + f": {self.weight:.2f}",
             self.generate_step_hint(0.1, 0.01),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -248,13 +249,13 @@ def draw_text_callback(self):
     if not self.is_editing:
         draw_hint(
             self,
-            "Randomize Weights [R]",
-            "Randomize the vertex weights for the selected group")
+            i18n.t("Randomize Weights [R]"),
+            i18n.t("Randomize the vertex weights for the selected group"))
 
         draw_hint(
             self,
-            f"Random Seed: {self.random_seed:.0f}",
-            "The auto-generated seed used for randomizing weights")
+            i18n.t("Random Seed") + f": {self.random_seed:.0f}",
+            i18n.t("The auto-generated seed used for randomizing weights"))
 
 
 def register():

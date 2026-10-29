@@ -28,6 +28,7 @@
 import bpy
 from . preferences import get_scene_unit_factor, get_scene_unit_suffix, get_scene_unit_scale, get_preferences
 from .. lib.overlay import update_overlay, toggle_pin_overlay, toggle_operator_passthrough
+from .. import i18n
 from .. lib.events import capture_modifier_keys, pressed
 
 
@@ -148,7 +149,7 @@ class BaseOperator(bpy.types.Operator):
 
 
     def yes_no_str(self, value):
-        return "Yes" if value else "No"
+        return i18n.t("Yes") if value else i18n.t("No")
 
 
     def list_options_str(self, options, capitalize=True):
@@ -160,8 +161,8 @@ class BaseOperator(bpy.types.Operator):
         if len(options_list) == 1:
             options_str = fmt(options_list[0])
         elif len(options_list) == 2:
-            options_str = " or ".join([fmt(opt) for opt in options_list])
+            options_str = i18n.t(" or ").join([fmt(opt) for opt in options_list])
         else:
-            options_str = ", ".join([fmt(opt) for opt in options_list[:-1]]) + ", or " + fmt(options_list[-1])
+            options_str = ", ".join([fmt(opt) for opt in options_list[:-1]]) + i18n.t(", or ") + fmt(options_list[-1])
 
-        return f"Options: {options_str}"
+        return i18n.t("Options") + f": {options_str}"

@@ -30,6 +30,7 @@ import bmesh
 from math import radians
 from mathutils import Euler
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.events import capture_modifier_keys, pressed
@@ -152,7 +153,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -387,7 +388,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Count: {self.count}",
+        i18n.t("Count") + f": {self.count}",
         self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -397,7 +398,7 @@ def draw_text_callback(self):
     angle_type_str = "Circle (360°)" if abs(self.angle) == 360 else f"Arc ({self.angle:.2f}°)"
     draw_property(
         self,
-        f"Angle: {angle_type_str}",
+        i18n.t("Angle") + f": {angle_type_str}",
         self.generate_key_hint("Alt", self.generate_step_hint(15, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -406,7 +407,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Offset: {(self.offset * display_unit_scale):.2f}{self.unit_suffix}",
+        i18n.t("Offset") + f": {(self.offset * display_unit_scale):.2f}{self.unit_suffix}",
         self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
@@ -417,12 +418,12 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Rotation Axis [A]: {axes[self.axis]}",
+        i18n.t("Rotation Axis [A]") + f": {axes[self.axis]}",
         self.list_options_str(axes))
 
     draw_hint(
         self,
-        f"Displacement Axis [D]: {axes[self.displace_axis]}",
+        i18n.t("Displacement Axis [D]") + f": {axes[self.displace_axis]}",
         self.list_options_str(axes))
 
 

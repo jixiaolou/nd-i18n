@@ -29,6 +29,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
@@ -119,7 +120,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -250,7 +251,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Thickness: {(self.thickness * self.display_unit_scale):.2f}{self.unit_suffix}",
+        i18n.t("Thickness") + f": {(self.thickness * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -259,7 +260,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Offset: {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}",
+        i18n.t("Offset") + f": {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
@@ -269,13 +270,13 @@ def draw_text_callback(self):
     weightings = ['Negative', 'Neutral', 'Positive']
     draw_hint(
         self,
-        f"Weighting [W]: {weightings[1 + round(self.weighting)]}",
+        i18n.t("Weighting [W]") + f": {weightings[1 + round(self.weighting)]}",
         self.list_options_str(weightings))
 
     extrusion_modes = ['Simple', 'Complex']
     draw_hint(
         self,
-        "Extrusion Mode [M]: {}".format("Complex" if self.complex_mode else "Simple"),
+        i18n.t("Extrusion Mode [M]: {}").format(i18n.t("Complex") if self.complex_mode else i18n.t("Simple")),
         self.list_options_str(extrusion_modes))
 
 

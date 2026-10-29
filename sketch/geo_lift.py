@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
@@ -68,7 +69,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
@@ -149,7 +150,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     def finish(self, context):
         if self.has_invalid_selection(context):
             self.revert(context)
-            self.report({'INFO'}, "Ensure at least a single peice of geometry is selected.")
+            self.report({'INFO'}, i18n.t("Ensure at least a single peice of geometry is selected."))
             return
 
         self.isolate_geometry(context)
@@ -179,13 +180,13 @@ def draw_text_callback(self):
     selection_types = ['Vertex', 'Edge', 'Face']
     draw_hint(
         self,
-        f"Selection Type [S, 1, 2, 3]: {selection_types[self.selection_type]}",
+        i18n.t("Selection Type [S, 1, 2, 3]") + f": {selection_types[self.selection_type]}",
         self.list_options_str(selection_types))
 
     draw_hint(
         self,
-        f"Exclusive View [E]: {self.yes_no_str(self.xray_mode)}",
-        "Show the target object in front of all other objects")
+        i18n.t("Exclusive View [E]") + f": {self.yes_no_str(self.xray_mode)}",
+        i18n.t("Show the target object in front of all other objects"))
 
 
 def register():

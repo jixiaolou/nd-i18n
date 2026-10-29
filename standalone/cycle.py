@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.base_operator import BaseOperator
+from .. import i18n
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import isolate_utils, hide_all_utils
@@ -93,7 +94,7 @@ SHIFT — Cycle through the modifier stack"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'INFO'}, "No active target object selected.")
+            self.report({'INFO'}, i18n.t("No active target object selected."))
             return {'CANCELLED'}
 
         self.mod_cycle = event.shift
@@ -273,55 +274,55 @@ def draw_text_callback(self):
             modifier_str = "None" if self.mod_current_index == -1 else self.mod_names[self.mod_current_index]
             draw_property(
                 self,
-                f"Modifier: {modifier_str}",
-                f"Active: {self.mod_current_index + 1}  /  Total: {self.mod_count}",
+                i18n.t("Modifier") + f": {modifier_str}",
+                i18n.t("Active") + f": {self.mod_current_index + 1}  /  " + i18n.t("Total") + f": {self.mod_count}",
                 active=True,
                 mouse_value=True,
                 alt_mode=False)
 
             draw_hint(
                 self,
-                f"Freeze State [F]: {self.yes_no_str(self.freeze_mod_cycle_state)}",
-                "Retain the current modifier state(s) on exit")
+                i18n.t("Freeze State [F]") + f": {self.yes_no_str(self.freeze_mod_cycle_state)}",
+                i18n.t("Retain the current modifier state(s) on exit"))
         else:
             draw_hint(self, "Whoops", "Looks like there are no modifiers to view.")
     else:
         if self.util_count > 0:
             draw_property(
                 self,
-                f"Utility: {self.util_mod_names[self.util_current_index]}",
-                f"Current: {self.util_current_index + 1}  /  Total: {self.util_count}",
+                i18n.t("Utility") + f": {self.util_mod_names[self.util_current_index]}",
+                i18n.t("Current") + f": {self.util_current_index + 1}  /  " + i18n.t("Total") + f": {self.util_count}",
                 active=True,
                 mouse_value=True,
                 alt_mode=False)
 
             draw_hint(
                 self,
-                f"Frozen [F]: {self.yes_no_str(self.util_mods[self.util_current_index].object in self.frozen_utils)}",
-                "Keep the current utility selected while cycling")
+                i18n.t("Frozen [F]") + f": {self.yes_no_str(self.util_mods[self.util_current_index].object in self.frozen_utils)}",
+                i18n.t("Keep the current utility selected while cycling"))
 
             draw_hint(
                 self,
-                f"Disable Modifier [D]: {self.yes_no_str(not self.util_mods[self.util_current_index].show_viewport)}",
-                "Disable the associated boolean modifier")
+                i18n.t("Disable Modifier [D]") + f": {self.yes_no_str(not self.util_mods[self.util_current_index].show_viewport)}",
+                i18n.t("Disable the associated boolean modifier"))
 
             draw_hint(
                 self,
-                f"Apply Modifier [A]: {self.yes_no_str(self.util_mods[self.util_current_index].object in self.applied_utils)}",
-                "Apply the associated boolean modifier")
+                i18n.t("Apply Modifier [A]") + f": {self.yes_no_str(self.util_mods[self.util_current_index].object in self.applied_utils)}",
+                i18n.t("Apply the associated boolean modifier"))
         else:
             draw_hint(self, "Whoops", "Looks like there are no utilities to cycle through.")
 
-    modes = ["Modifier", "Utility"]
+    modes = [i18n.t("Modifier"), i18n.t("Utility")]
     draw_hint(
         self,
-        f"Mode [M]: {modes[0] if self.mod_cycle else modes[1]}",
+        i18n.t("Mode [M]") + f": {modes[0] if self.mod_cycle else modes[1]}",
         self.list_options_str(modes))
 
     draw_hint(
         self,
-        f"Wireframe [W]: {self.yes_no_str(self.show_wireframe)}",
-        "Display the object's wireframe while cycling")
+        i18n.t("Wireframe [W]") + f": {self.yes_no_str(self.show_wireframe)}",
+        i18n.t("Display the object's wireframe while cycling"))
 
 
 def register():
