@@ -352,9 +352,12 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.energy_offset_input_stream)
 
-    draw_hint(self, "New Rig [R]", "Generate a new randomised rig and reset light options")
-    draw_hint(self, "New Colors [C]", "Generate new randomised colors for the lights")
-    draw_hint(self, "New Energy [E]", "Generate new randomised energy for the lights")
+    draw_hint(self, i18n.t("New Rig [R]"),
+              i18n.t("Generate a new randomised rig and reset light options"))
+    draw_hint(self, i18n.t("New Colors [C]"),
+              i18n.t("Generate new randomised colors for the lights"))
+    draw_hint(self, i18n.t("New Energy [E]"),
+              i18n.t("Generate new randomised energy for the lights"))
 
 
 def register():

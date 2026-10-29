@@ -175,7 +175,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to extract")
+    draw_hint(self, i18n.t("Confirm Geometry [Space]"),
+              i18n.t("Comfirm the geometry to extract"))
 
     selection_types = ['Vertex', 'Edge', 'Face']
     draw_hint(

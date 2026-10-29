@@ -34,7 +34,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
+from .. lib.modifiers import nd_name, new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, obj_verts_selected, app_minor_version
 from .. lib.math import round_dec
 
@@ -181,7 +181,7 @@ CTRL — Remove existing modifiers"""
                 active_vgroup_names = [vgroup.name for vgroup in object.vertex_groups]
 
                 for mod in object.modifiers:
-                    if mod.type == 'BEVEL' and ' — ND VB' in mod.name and mod.vertex_group and mod.vertex_group in active_vgroup_names:
+                    if mod.type == 'BEVEL' and ' — ND VB' in nd_name(mod) and mod.vertex_group and mod.vertex_group in active_vgroup_names:
                         old_vgroup_names.append(mod.vertex_group)
 
                 for vgroup_name in old_vgroup_names:

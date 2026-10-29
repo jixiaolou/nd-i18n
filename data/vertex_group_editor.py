@@ -227,7 +227,10 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        f"Vertex Group ({self.vertex_group_index + 1}/{len(self.vertex_groups)}): {self.vertex_groups[self.vertex_group_index].name}",
+        i18n.t("Vertex Group ({index}/{total}): {name}").format(
+            index=self.vertex_group_index + 1,
+            total=len(self.vertex_groups),
+            name=self.vertex_groups[self.vertex_group_index].name),
         i18n.t("Cycle between vertex groups"))
 
     draw_hint(

@@ -395,7 +395,8 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.count_input_stream)
 
-    angle_type_str = "Circle (360°)" if abs(self.angle) == 360 else f"Arc ({self.angle:.2f}°)"
+    angle_type_str = i18n.t("Circle (360°)") if abs(self.angle) == 360 else \
+        i18n.t("Arc ({angle:.2f}°)").format(angle=self.angle)
     draw_property(
         self,
         i18n.t("Angle") + f": {angle_type_str}",

@@ -259,7 +259,8 @@ def draw_text_callback(self):
     draw_header(self)
 
     if self.stage == 0:
-        draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to extract")
+        draw_hint(self, i18n.t("Confirm Geometry [Space]"),
+              i18n.t("Comfirm the geometry to extract"))
 
     if self.stage == 1:
         draw_property(

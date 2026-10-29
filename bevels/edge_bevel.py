@@ -501,7 +501,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Segments: {}".format(self.segments),
+        i18n.t("Segments: {}").format(self.segments),
         self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -510,7 +510,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Profile: {0:.2f}".format(self.profile),
+        i18n.t("Profile: {0:.2f}").format(self.profile),
         self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,

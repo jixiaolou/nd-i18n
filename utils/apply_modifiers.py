@@ -28,7 +28,7 @@
 import bpy
 import bmesh
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
-from .. lib.modifiers import is_sba_mod
+from .. lib.modifiers import nd_name, is_sba_mod
 
 
 class ND_OT_apply_modifiers(bpy.types.Operator):
@@ -119,7 +119,7 @@ ALT — Duplicate the mesh before applying modifiers"""
                 if is_sba_mod(mod):
                     continue
 
-                if skip_weld and mod.type == 'WELD' and "— ND B" in mod.name:
+                if skip_weld and mod.type == 'WELD' and "— ND B" in nd_name(mod):
                     skip_weld = False
                     continue
 

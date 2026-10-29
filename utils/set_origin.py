@@ -29,7 +29,7 @@ import bpy
 from mathutils import Vector
 from .. lib.objects import set_origin, get_real_active_object
 from .. import i18n
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import nd_name, new_modifier
 from .. lib.polling import ctx_obj_mode, obj_exists, obj_is_mesh, ctx_edit_mode, ctx_objects_selected
 
 
@@ -98,7 +98,7 @@ SHIFT — Undo faux origin translation"""
     def revert_faux_origin(self, context):
         location = context.active_object.location.copy()
 
-        mods = [mod for mod in context.active_object.modifiers if mod.type == 'DISPLACE' and mod.name.endswith('— ND FO')]
+        mods = [mod for mod in context.active_object.modifiers if mod.type == 'DISPLACE' and nd_name(mod).endswith('— ND FO')]
         for mod in mods:
             if mod.direction == 'X':
                 location.x += mod.strength

@@ -142,7 +142,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         i18n.t("Collection") + f": {self.collection_names[self.active_collection]}",
-        "Where to place the new object...",
+        i18n.t("Where to place the new object..."),
         active=True,
         mouse_value=True,
         alt_mode=False)

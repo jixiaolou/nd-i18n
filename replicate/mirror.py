@@ -426,7 +426,8 @@ def draw_text_callback(self):
     draw_header(self)
 
     if self.geometry_mode and not self.geometry_ready:
-        draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to mirrored across")
+        draw_hint(self, i18n.t("Confirm Geometry [Space]"),
+                  i18n.t("Comfirm the geometry to mirrored across"))
 
         selection_types = ['Vertex', 'Edge', 'Face']
         draw_hint(

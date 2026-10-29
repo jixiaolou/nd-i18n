@@ -28,13 +28,67 @@
 import bpy
 import re
 from math import radians
+from .. import i18n
 from . preferences import get_preferences
 from . polling import app_minor_version
 from . node_groups import set_node_input
 
 
+#: Separates the descriptive half of a modifier name from its ASCII tag.
+SEPARATOR = " — "
+
+#: Custom property holding the locale independent (English) modifier name, so
+#: renaming a modifier for display never breaks the code that looks it up.
+ND_KIND = "nd_kind"
+
+
+def nd_name(mod):
+    """English name ND gave a modifier, whatever language is displayed.
+
+    Falls back to the displayed name for modifiers made before this existed or
+    by other add-ons, which is exactly the behaviour the old code assumed.
+    """
+    try:
+        return mod[ND_KIND]
+    except (KeyError, AttributeError, TypeError):
+        return mod.name
+
+
+def tag_modifier(mod, english_name):
+    """Remember the English name on the modifier. False if unsupported."""
+    try:
+        mod[ND_KIND] = english_name
+        return True
+    except (KeyError, AttributeError, TypeError):
+        return False
+
+
+def localized_modifier_name(name):
+    """Translate the descriptive part of a modifier name, keep the ASCII tag.
+
+    "Bevel — ND EB" becomes "倒角 — ND EB". Names without a separator are left
+    alone: they are either Blender's own modifiers or free text.
+    """
+    prefix, separator, tag = name.partition(SEPARATOR)
+    if not separator:
+        return name
+
+    translated = i18n.t(prefix)
+    if translated == prefix:
+        return name
+
+    return translated + separator + tag
+
+
 def new_modifier(object, mod_name, mod_type, rectify=True):
     mod = object.modifiers.new(mod_name, mod_type)
+
+    # Only localise the displayed name when the English one could be stored:
+    # without it, name based lookups would break.
+    if tag_modifier(mod, mod_name):
+        display_name = localized_modifier_name(mod_name)
+        if display_name != mod_name:
+            mod.name = display_name
 
     mod.show_viewport = True
     mod.show_in_editmode = True
@@ -66,19 +120,19 @@ def rectify_mod_order(object, mod_name):
 
     matching_mod_index = None
     for index, mod in enumerate(mods):
-        if "Weighted Normal — ND WN" in mod.name:
+        if "Weighted Normal — ND WN" in nd_name(mod):
             matching_mod_index = index
             break
 
-        if "Weld — ND SW" in mod.name:
+        if "Weld — ND SW" in nd_name(mod):
             matching_mod_index = index
             break
 
-        if "Weld — ND B" in mod.name:
+        if "Weld — ND B" in nd_name(mod):
             matching_mod_index = index
             break
 
-        if "Decimate — ND SD" in mod.name:
+        if "Decimate — ND SD" in nd_name(mod):
             matching_mod_index = index
             break
 
@@ -97,7 +151,7 @@ def is_sba_mod(mod):
     if mod.type != 'NODES':
         return False
 
-    if mod.name.startswith("Smooth — ND SBA") or mod.name.startswith("Smooth by Angle"):
+    if nd_name(mod).startswith("Smooth — ND SBA") or mod.name.startswith("Smooth by Angle"):
         return True
 
     if mod.node_group is not None and mod.node_group.name.startswith("Smooth by Angle"):
@@ -161,7 +215,10 @@ def add_smooth_by_angle(context, object):
         if sba_mod == None:
             return
 
-        sba_mod.name = "Smooth — ND SBA"
+        if tag_modifier(sba_mod, "Smooth — ND SBA"):
+            sba_mod.name = localized_modifier_name("Smooth — ND SBA")
+        else:
+            sba_mod.name = "Smooth — ND SBA"
         set_smoothing_angle(context, object, radians(float(get_preferences().default_smoothing_angle)), True)
 
         ensure_tail_mod_consistency(object, force=True)
@@ -187,10 +244,12 @@ def ensure_tail_mod_consistency(object, force=False):
         return
 
     mod_order = ['Smooth by Angle', 'Smooth — ND SBA', 'Weighted Normal — ND WN', 'Triangulate — ND']
-    object_mods = [mod.name for mod in list(object.modifiers)]
+    object_mods = list(object.modifiers)
+    real_names = {nd_name(mod): mod.name for mod in object_mods}
 
-    for mod_name in mod_order:
-        if not(mod_name in object_mods):
+    for wanted in mod_order:
+        mod_name = real_names.get(wanted)
+        if mod_name is None:
             continue
 
         if app_minor_version() < (4, 0):
@@ -205,11 +264,11 @@ def remove_problematic_boolean_mods(object):
     remove_mods = []
 
     for mod in mods:
-        if mod.name == "Weighted Normal — ND WN":
+        if nd_name(mod) == "Weighted Normal — ND WN":
             remove_mods.append(mod)
             continue
 
-        if mod.name == "Triangulate — ND":
+        if nd_name(mod) == "Triangulate — ND":
             remove_mods.append(mod)
             continue
 
@@ -224,10 +283,11 @@ def remove_problematic_boolean_mods(object):
 
 def remove_modifiers_ending_with(objects, suffix, strict=False):
     for object in objects:
-        mods = object.modifiers
-        mod_names = [mod.name for mod in mods]
-        for mod_name in mod_names:
-            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name) if not strict else mod_name
+        for mod in list(object.modifiers):
+            mod_name = mod.name
+            base_name = nd_name(mod) if not strict else mod_name
+            if not strict:
+                base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", base_name)
             if base_name.endswith(suffix):
                 if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
@@ -238,10 +298,9 @@ def remove_modifiers_ending_with(objects, suffix, strict=False):
 
 def remove_modifiers_starting_with(objects, suffix):
     for object in objects:
-        mods = object.modifiers
-        mod_names = [mod.name for mod in mods]
-        for mod_name in mod_names:
-            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name)
+        for mod in list(object.modifiers):
+            mod_name = mod.name
+            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", nd_name(mod))
             if base_name.startswith(suffix):
                 if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)

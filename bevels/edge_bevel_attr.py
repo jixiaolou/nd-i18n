@@ -34,7 +34,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
+from .. lib.modifiers import nd_name, new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.polling import ctx_edit_mode, obj_edges_selected, obj_is_mesh, app_minor_version
 from .. lib.math import round_dec
 
@@ -384,7 +384,7 @@ Min Blender Version: %s""" % '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         has_previous_weld = False
         previous_weld_index = 0
         for i, mod in enumerate(self.target_object.modifiers):
-            if mod.name == mod_weld and mod.type == 'WELD':
+            if nd_name(mod) == mod_weld and mod.type == 'WELD':
                 has_previous_weld = True
                 previous_weld_index = i
                 break

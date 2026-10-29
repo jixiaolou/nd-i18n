@@ -285,7 +285,8 @@ def draw_text_callback(self):
                 i18n.t("Freeze State [F]") + f": {self.yes_no_str(self.freeze_mod_cycle_state)}",
                 i18n.t("Retain the current modifier state(s) on exit"))
         else:
-            draw_hint(self, "Whoops", "Looks like there are no modifiers to view.")
+            draw_hint(self, i18n.t("Whoops"),
+                      i18n.t("Looks like there are no modifiers to view."))
     else:
         if self.util_count > 0:
             draw_property(
@@ -311,7 +312,8 @@ def draw_text_callback(self):
                 i18n.t("Apply Modifier [A]") + f": {self.yes_no_str(self.util_mods[self.util_current_index].object in self.applied_utils)}",
                 i18n.t("Apply the associated boolean modifier"))
         else:
-            draw_hint(self, "Whoops", "Looks like there are no utilities to cycle through.")
+            draw_hint(self, i18n.t("Whoops"),
+                      i18n.t("Looks like there are no utilities to cycle through."))
 
     modes = [i18n.t("Modifier"), i18n.t("Utility")]
     draw_hint(
