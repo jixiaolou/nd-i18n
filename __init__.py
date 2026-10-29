@@ -680,6 +680,13 @@ def register():
 
     bpy.utils.register_class(NDPreferences)
 
+    # Labels that embed a version ("Bevels — ND v%s", the "Min Blender Version"
+    # footer of a tooltip) are stored as format strings in the locales, so the
+    # catalogue needs to know which versions to substitute.
+    i18n.set_version(
+        '.'.join([str(v) for v in bl_info['version']]),
+        '.'.join([str(v) for v in bevels.edge_bevel_attr.MIN_BLENDER_VERSION]),
+    )
     i18n.load_locales()
     i18n.activate(pref_language())
 

@@ -54,7 +54,7 @@ class ND_OT_edge_bevel_attr(BaseOperator):
 SHIFT — Place modifiers at the top of the stack
 CTRL — Remove existing modifiers
 
-Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
+Min Blender Version: %s""" % '.'.join([str(v) for v in MIN_BLENDER_VERSION])
 
 
     key_callbacks = {

@@ -79,6 +79,59 @@ _forced_locale: Optional[str] = None
 
 _translations_registered = False
 
+#: Values substituted into msgids that contain ``%s``: the add-on version first,
+#: then any other version a label embeds (a "Min Blender Version" footer).
+_VERSIONS: Tuple[str, ...] = ()
+
+#: locale identifier -> messages with the ``%s`` msgids already resolved.
+_EXPANDED: Dict[str, Dict[str, str]] = {}
+
+
+def set_version(version: str, *extra: str) -> None:
+    """Versions substituted into msgids like ``"Bevels — ND v%s"``."""
+    global _VERSIONS
+    versions = tuple(v for v in (version,) + extra if v)
+    if versions != _VERSIONS:
+        _VERSIONS = versions
+        _EXPANDED.clear()
+
+
+def messages_for(locale: str) -> Dict[str, str]:
+    """Messages of one locale, with every ``%s`` msgid resolved to a version.
+
+    Several labels are built with a version appended (menu titles such as
+    ``"Bevels — ND v2.2.1"``, operator tooltips ending in a minimum Blender
+    version). Translating those as a whole would orphan the translations on
+    every release, so the catalogue stores the format string and gets the
+    version filled in here. The source code keeps the plain English label, which
+    means Blender's own lookup still runs on every redraw, so the label follows a
+    language change without a restart.
+    """
+    data = _LOCALES.get(locale)
+    if data is None:
+        return {}
+    if not _VERSIONS:
+        return data["messages"]
+
+    cached = _EXPANDED.get(locale)
+    if cached is not None:
+        return cached
+
+    messages: Dict[str, str] = {}
+    for msgid, translation in data["messages"].items():
+        messages[msgid] = translation
+        if "%s" not in msgid:
+            continue
+        for version in _VERSIONS:
+            try:
+                messages[msgid % version] = translation % version
+            except (TypeError, ValueError):
+                print(f"{ADDON_NAME}: bad placeholder in {msgid!r} ({locale})")
+                break
+
+    _EXPANDED[locale] = messages
+    return messages
+
 
 # ---------------------------------------------------------------------------
 # Loading the JSON language files
@@ -88,6 +141,7 @@ _translations_registered = False
 def load_locales() -> Dict[str, dict]:
     """(Re)load every ``*.json`` file in the locales folder."""
     _LOCALES.clear()
+    _EXPANDED.clear()
     if not os.path.isdir(LOCALES_DIR):
         print(f"{ADDON_NAME}: locales folder not found: {LOCALES_DIR}")
         return _LOCALES
@@ -178,7 +232,7 @@ def _catalog(messages: Dict[str, str]) -> Dict[Tuple[str, str], str]:
 def build_catalogs(forced_locale: Optional[str] = None) -> Dict[str, dict]:
     """Build the dictionary handed to ``bpy.app.translations.register()``."""
     catalogs = {
-        locale: _catalog(data["messages"]) for locale, data in _LOCALES.items()
+        locale: _catalog(messages_for(locale)) for locale in _LOCALES
     }
 
     if forced_locale and forced_locale in _LOCALES:
@@ -187,7 +241,7 @@ def build_catalogs(forced_locale: Optional[str] = None) -> Dict[str, dict]:
             # Blender only consults the catalogue of the language it displays.
             # Injecting the chosen language there makes RNA strings (property
             # names/tooltips, operator names) follow the add-on preference too.
-            catalogs[ui_locale] = _catalog(_LOCALES[forced_locale]["messages"])
+            catalogs[ui_locale] = _catalog(messages_for(forced_locale))
     return catalogs
 
 
@@ -270,7 +324,7 @@ def t(msgid: str) -> str:
     """Translate a message ID; returns the message ID when untranslated."""
     locale = active_locale()
     if locale:
-        translation = _LOCALES[locale]["messages"].get(msgid)
+        translation = messages_for(locale).get(msgid)
         if translation is not None:
             return translation
 
