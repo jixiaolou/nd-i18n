@@ -179,13 +179,24 @@ def localize_scene_modifier_names():
     return changed
 
 
+def rename_modifier(mod, english_name):
+    """Give a modifier its ND name, translated when possible.
+
+    The English name is always applied first, so the ASCII tag is in place
+    before the prefix is translated.
+    """
+    mod.name = english_name
+    _store_kind(mod, mod.name)
+
+    localized = localized_modifier_name(english_name)
+    if localized != english_name:
+        mod.name = localized
+
+
 def new_modifier(object, mod_name, mod_type, rectify=True):
     mod = object.modifiers.new(mod_name, mod_type)
 
-    _store_kind(mod, mod.name)
-    display_name = localized_modifier_name(mod.name)
-    if display_name != mod.name:
-        mod.name = display_name
+    rename_modifier(mod, mod_name)
 
     mod.show_viewport = True
     mod.show_in_editmode = True
@@ -313,10 +324,7 @@ def add_smooth_by_angle(context, object):
         if sba_mod == None:
             return
 
-        if tag_modifier(sba_mod, "Smooth — ND SBA"):
-            sba_mod.name = localized_modifier_name("Smooth — ND SBA")
-        else:
-            sba_mod.name = "Smooth — ND SBA"
+        rename_modifier(sba_mod, "Smooth — ND SBA")
         set_smoothing_angle(context, object, radians(float(get_preferences().default_smoothing_angle)), True)
 
         ensure_tail_mod_consistency(object, force=True)
