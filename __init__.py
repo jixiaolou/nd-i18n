@@ -37,6 +37,10 @@ bl_info = {
     "category": "3D View"
 }
 
+#: Version substituted into translated labels that embed it ("Bevels — ND v%s").
+#: Captured next to bl_info so nothing later has to look bl_info up again.
+ADDON_VERSION = '.'.join([str(v) for v in bl_info['version']])
+
 
 import bpy
 import importlib
@@ -68,6 +72,19 @@ from . import standalone
 from . import utils
 from . import viewport
 from . import icons
+
+
+# Labels that embed a version ("Bevels — ND v%s", the "Min Blender Version"
+# footer of an operator tooltip) are stored as format strings in the locales, so
+# the catalogue has to know which versions to substitute. Done here, at import
+# time, so nothing later depends on module globals still being intact.
+try:
+    i18n.set_version(
+        ADDON_VERSION,
+        '.'.join([str(v) for v in bevels.edge_bevel_attr.MIN_BLENDER_VERSION]),
+    )
+except Exception as set_version_error:
+    print(f"ND: could not prepare translated labels ({set_version_error})")
 
 
 registerables = (
@@ -680,15 +697,12 @@ def register():
 
     bpy.utils.register_class(NDPreferences)
 
-    # Labels that embed a version ("Bevels — ND v%s", the "Min Blender Version"
-    # footer of a tooltip) are stored as format strings in the locales, so the
-    # catalogue needs to know which versions to substitute.
-    i18n.set_version(
-        '.'.join([str(v) for v in bl_info['version']]),
-        '.'.join([str(v) for v in bevels.edge_bevel_attr.MIN_BLENDER_VERSION]),
-    )
-    i18n.load_locales()
-    i18n.activate(pref_language())
+    # Translation setup must never stop the add-on from loading.
+    try:
+        i18n.load_locales()
+        i18n.activate(pref_language())
+    except Exception as ex:
+        print(f"ND: translation setup failed ({ex}); falling back to English")
 
     if not bpy.app.timers.is_registered(_sync_language):
         bpy.app.timers.register(_sync_language, first_interval=0.5, persistent=True)
