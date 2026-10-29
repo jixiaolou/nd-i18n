@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import nd_name, new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
+from .. lib.modifiers import is_modifier, new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
@@ -62,7 +62,7 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
             return {'FINISHED'}
 
         for obj in valid_objects:
-            if any('Triangulate — ND' in nd_name(mod) for mod in obj.modifiers):
+            if any(is_modifier(mod, 'Triangulate — ND') for mod in obj.modifiers):
                 continue
 
             triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)

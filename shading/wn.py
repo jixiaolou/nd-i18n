@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import nd_name, new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
+from .. lib.modifiers import has_tag, new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
@@ -59,7 +59,7 @@ CTRL — Remove existing modifiers"""
         self.keep_sharp = not event.shift
 
         for obj in valid_objects:
-            if any(' — ND WN' in nd_name(mod) for mod in obj.modifiers):
+            if any(has_tag(mod, 'ND WN') for mod in obj.modifiers):
                 continue
 
             mod = new_modifier(obj, 'Weighted Normal — ND WN', 'WEIGHTED_NORMAL', rectify=False)

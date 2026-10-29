@@ -142,6 +142,7 @@ def load_locales() -> Dict[str, dict]:
     """(Re)load every ``*.json`` file in the locales folder."""
     _LOCALES.clear()
     _EXPANDED.clear()
+    _VARIANTS.clear()
     if not os.path.isdir(LOCALES_DIR):
         print(f"{ADDON_NAME}: locales folder not found: {LOCALES_DIR}")
         return _LOCALES
@@ -187,6 +188,32 @@ def available_locales() -> List[str]:
 def locale_label(locale: str) -> str:
     data = _LOCALES.get(locale)
     return data["name"] if data else locale
+
+
+#: msgid -> every translation of it, filled on demand.
+_VARIANTS: Dict[str, frozenset] = {}
+
+
+def variants(msgid: str) -> frozenset:
+    """The message id plus its translation in every loaded locale.
+
+    Used where a value stored in the .blend has to be recognised whatever
+    language is active now: a Chinese modifier name must still be understood
+    after switching the interface to English.
+    """
+    cached = _VARIANTS.get(msgid)
+    if cached is not None:
+        return cached
+
+    values = {msgid}
+    for data in _LOCALES.values():
+        translated = data["messages"].get(msgid)
+        if translated:
+            values.add(translated)
+
+    result = frozenset(values)
+    _VARIANTS[msgid] = result
+    return result
 
 
 def load_msgids() -> List[str]:

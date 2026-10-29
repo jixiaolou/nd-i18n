@@ -37,25 +37,29 @@ from . node_groups import set_node_input
 #: Separates the descriptive half of a modifier name from its ASCII tag.
 SEPARATOR = " — "
 
-#: Custom property holding the locale independent (English) modifier name, so
-#: renaming a modifier for display never breaks the code that looks it up.
+#: Optional custom property holding the English name. It only helps with
+#: switching between two non-English languages; matching never relies on it,
+#: because not every Blender version lets you write custom properties on a
+#: modifier.
 ND_KIND = "nd_kind"
 
+#: Blender appends ".001" and friends when a name is already taken.
+_NAME_SUFFIX = re.compile(r"\.[0-9]{3}$")
 
-def nd_name(mod):
-    """English name ND gave a modifier, whatever language is displayed.
 
-    Falls back to the displayed name for modifiers made before this existed or
-    by other add-ons, which is exactly the behaviour the old code assumed.
-    """
+def base_name(name):
+    """Modifier name without the duplicate suffix Blender adds."""
+    return _NAME_SUFFIX.sub("", name)
+
+
+def _stored_kind(mod):
     try:
         return mod[ND_KIND]
     except (KeyError, AttributeError, TypeError):
-        return mod.name
+        return None
 
 
-def tag_modifier(mod, english_name):
-    """Remember the English name on the modifier. False if unsupported."""
+def _store_kind(mod, english_name):
     try:
         mod[ND_KIND] = english_name
         return True
@@ -63,11 +67,25 @@ def tag_modifier(mod, english_name):
         return False
 
 
+def english_name(mod):
+    """Best known English name of a modifier."""
+    kind = _stored_kind(mod)
+    return kind if kind else mod.name
+
+
+def _prefix_variants(prefix):
+    """The English prefix plus its translation in every language we ship.
+
+    Matching therefore survives a language switch in either direction.
+    """
+    return i18n.variants(prefix)
+
+
 def localized_modifier_name(name):
     """Translate the descriptive part of a modifier name, keep the ASCII tag.
 
     "Bevel — ND EB" becomes "倒角 — ND EB". Names without a separator are left
-    alone: they are either Blender's own modifiers or free text.
+    alone: they are Blender's own modifiers or free text.
     """
     prefix, separator, tag = name.partition(SEPARATOR)
     if not separator:
@@ -80,58 +98,83 @@ def localized_modifier_name(name):
     return translated + separator + tag
 
 
-#: ND's own modifier names look like "<prefix> — ND..."; the tag half is ASCII
-#: so a modifier created before the names became translatable can be adopted.
-_ADOPT_RE = re.compile(r"^(?P<prefix>.+?) — (?P<tag>ND.*)$")
+def refresh_modifier_name(mod):
+    """Re-apply the current language to one modifier. True when it changed."""
+    wanted = localized_modifier_name(english_name(mod))
 
-
-def has_kind(mod):
-    try:
-        mod[ND_KIND]
-        return True
-    except (KeyError, AttributeError, TypeError):
+    # Compare without the duplicate suffix: a ".001" copy must not be
+    # rewritten over and over, Blender would just renumber it again.
+    if base_name(wanted) == base_name(mod.name):
         return False
 
-
-def adopt_modifier_name(mod):
-    """Tag a modifier that predates i18n and translate its displayed name.
-
-    Only names that follow ND's convention are touched, so modifiers the user
-    or another add-on named are left alone.
-    """
-    if has_kind(mod):
-        return False
-
-    if not _ADOPT_RE.match(mod.name):
-        return False
-
-    english = mod.name
-    localized = localized_modifier_name(english)
-    if localized == english:
-        # Nothing to translate: leave the data untouched so opening a file in
-        # English does not mark it as modified.
-        return False
-
-    if not tag_modifier(mod, english):
-        return False
-
-    mod.name = localized
+    mod.name = wanted
     return True
 
 
+def is_modifier(mod, wanted):
+    """True when the modifier is the one ND calls ``wanted``.
+
+    The tag is compared exactly, the prefix either as stored English or as its
+    translation. That keeps the check working after a language switch, for
+    modifiers made before the names became translatable, and for modifiers
+    whose name the user has since edited.
+    """
+    have = base_name(mod.name)
+    target = base_name(wanted)
+    if have == target:
+        return True
+
+    p_have, s_have, t_have = have.partition(SEPARATOR)
+    p_want, s_want, t_want = target.partition(SEPARATOR)
+    if not s_have or not s_want or t_have != t_want:
+        return False
+
+    return p_have in _prefix_variants(p_want)
+
+
+def has_tag(mod, tag):
+    """True when the ASCII tag of the modifier is ``tag``, e.g. "ND EB"."""
+    _, separator, t_have = base_name(mod.name).partition(SEPARATOR)
+    return bool(separator) and t_have == tag
+
+
+def modifier_ends_with(mod, suffix, strict=False):
+    """The check behind remove_modifiers_ending_with, language aware.
+
+    ``strict`` compares the name as-is instead of ignoring the ".001" suffix,
+    but the prefix is still matched in any language.
+    """
+    have = mod.name if strict else base_name(mod.name)
+    if have.endswith(suffix):
+        return True
+
+    p_have, s_have, t_have = have.partition(SEPARATOR)
+    p_suffix, s_suffix, t_suffix = suffix.partition(SEPARATOR)
+    if not s_have or not s_suffix or t_have != t_suffix:
+        return False
+
+    if not p_suffix:
+        return True
+
+    return p_have in _prefix_variants(p_suffix)
+
+
+def modifier_starts_with(mod, prefix):
+    """The check behind remove_modifiers_starting_with, language aware."""
+    have = base_name(mod.name)
+    if have.startswith(prefix):
+        return True
+
+    p_have = have.partition(SEPARATOR)[0]
+    return any(p_have.startswith(v) for v in _prefix_variants(prefix))
+
+
 def localize_scene_modifier_names():
-    """Apply the current language to every ND modifier already in the file."""
+    """Apply the current language to every modifier already in the file."""
     changed = 0
     for obj in bpy.data.objects:
         for mod in obj.modifiers:
-            if adopt_modifier_name(mod):
-                changed += 1
-                continue
-            if not has_kind(mod):
-                continue
-            wanted = localized_modifier_name(nd_name(mod))
-            if mod.name != wanted:
-                mod.name = wanted
+            if refresh_modifier_name(mod):
                 changed += 1
     return changed
 
@@ -139,12 +182,10 @@ def localize_scene_modifier_names():
 def new_modifier(object, mod_name, mod_type, rectify=True):
     mod = object.modifiers.new(mod_name, mod_type)
 
-    # Only localise the displayed name when the English one could be stored:
-    # without it, name based lookups would break.
-    if tag_modifier(mod, mod_name):
-        display_name = localized_modifier_name(mod_name)
-        if display_name != mod_name:
-            mod.name = display_name
+    _store_kind(mod, mod.name)
+    display_name = localized_modifier_name(mod.name)
+    if display_name != mod.name:
+        mod.name = display_name
 
     mod.show_viewport = True
     mod.show_in_editmode = True
@@ -176,19 +217,19 @@ def rectify_mod_order(object, mod_name):
 
     matching_mod_index = None
     for index, mod in enumerate(mods):
-        if "Weighted Normal — ND WN" in nd_name(mod):
+        if is_modifier(mod, "Weighted Normal — ND WN"):
             matching_mod_index = index
             break
 
-        if "Weld — ND SW" in nd_name(mod):
+        if is_modifier(mod, "Weld — ND SW"):
             matching_mod_index = index
             break
 
-        if "Weld — ND B" in nd_name(mod):
+        if is_modifier(mod, "Weld — ND B"):
             matching_mod_index = index
             break
 
-        if "Decimate — ND SD" in nd_name(mod):
+        if is_modifier(mod, "Decimate — ND SD"):
             matching_mod_index = index
             break
 
@@ -207,7 +248,7 @@ def is_sba_mod(mod):
     if mod.type != 'NODES':
         return False
 
-    if nd_name(mod).startswith("Smooth — ND SBA") or mod.name.startswith("Smooth by Angle"):
+    if is_modifier(mod, "Smooth — ND SBA") or mod.name.startswith("Smooth by Angle"):
         return True
 
     if mod.node_group is not None and mod.node_group.name.startswith("Smooth by Angle"):
@@ -250,6 +291,7 @@ def add_smooth_by_angle(context, object):
 
         if sba_node_group != None:
             sba_mod = object.modifiers.new("Smooth — ND SBA", 'NODES')
+            _store_kind(sba_mod, sba_mod.name)
             sba_mod.node_group = sba_node_group
             if app_minor_version() > (4, 1):
                 sba_mod.use_pin_to_last = True
@@ -301,10 +343,13 @@ def ensure_tail_mod_consistency(object, force=False):
 
     mod_order = ['Smooth by Angle', 'Smooth — ND SBA', 'Weighted Normal — ND WN', 'Triangulate — ND']
     object_mods = list(object.modifiers)
-    real_names = {nd_name(mod): mod.name for mod in object_mods}
 
     for wanted in mod_order:
-        mod_name = real_names.get(wanted)
+        mod_name = None
+        for mod in object_mods:
+            if is_modifier(mod, wanted):
+                mod_name = mod.name
+                break
         if mod_name is None:
             continue
 
@@ -320,11 +365,11 @@ def remove_problematic_boolean_mods(object):
     remove_mods = []
 
     for mod in mods:
-        if nd_name(mod) == "Weighted Normal — ND WN":
+        if is_modifier(mod, "Weighted Normal — ND WN"):
             remove_mods.append(mod)
             continue
 
-        if nd_name(mod) == "Triangulate — ND":
+        if is_modifier(mod, "Triangulate — ND"):
             remove_mods.append(mod)
             continue
 
@@ -341,10 +386,7 @@ def remove_modifiers_ending_with(objects, suffix, strict=False):
     for object in objects:
         for mod in list(object.modifiers):
             mod_name = mod.name
-            base_name = nd_name(mod) if not strict else mod_name
-            if not strict:
-                base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", base_name)
-            if base_name.endswith(suffix):
+            if modifier_ends_with(mod, suffix, strict):
                 if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
                 else:
@@ -356,8 +398,7 @@ def remove_modifiers_starting_with(objects, suffix):
     for object in objects:
         for mod in list(object.modifiers):
             mod_name = mod.name
-            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", nd_name(mod))
-            if base_name.startswith(suffix):
+            if modifier_starts_with(mod, suffix):
                 if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
                 else:
