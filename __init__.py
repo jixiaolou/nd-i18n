@@ -117,6 +117,7 @@ def pref_language():
 
 def _on_language_changed(self, context):
     i18n.activate(self.language)
+    _restyle_modifier_names()
 
 
 def _sync_language():
@@ -124,6 +125,15 @@ def _sync_language():
     # preferences at start-up) take effect without restarting Blender.
     i18n.ensure_active(pref_language())
     return 1.0
+
+
+def _restyle_modifier_names():
+    # Modifier names are data, not UI: they only follow the language if they are
+    # rewritten. Never let that break anything else.
+    try:
+        lib.modifiers.localize_scene_modifier_names()
+    except Exception as ex:
+        print(f"ND: could not rename modifiers ({ex})")
 
 
 class NDPreferences(AddonPreferences):
@@ -688,6 +698,8 @@ def post_load_handler(_a, _b):
                 if space.type == 'OUTLINER':
                     space.show_restrict_column_viewport = True
 
+    _restyle_modifier_names()
+
 
 bpy.app.handlers.load_post.append(post_load_handler)
 
@@ -701,6 +713,7 @@ def register():
     try:
         i18n.load_locales()
         i18n.activate(pref_language())
+        _restyle_modifier_names()
     except Exception as ex:
         print(f"ND: translation setup failed ({ex}); falling back to English")
 

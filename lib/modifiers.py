@@ -80,6 +80,62 @@ def localized_modifier_name(name):
     return translated + separator + tag
 
 
+#: ND's own modifier names look like "<prefix> — ND..."; the tag half is ASCII
+#: so a modifier created before the names became translatable can be adopted.
+_ADOPT_RE = re.compile(r"^(?P<prefix>.+?) — (?P<tag>ND.*)$")
+
+
+def has_kind(mod):
+    try:
+        mod[ND_KIND]
+        return True
+    except (KeyError, AttributeError, TypeError):
+        return False
+
+
+def adopt_modifier_name(mod):
+    """Tag a modifier that predates i18n and translate its displayed name.
+
+    Only names that follow ND's convention are touched, so modifiers the user
+    or another add-on named are left alone.
+    """
+    if has_kind(mod):
+        return False
+
+    if not _ADOPT_RE.match(mod.name):
+        return False
+
+    english = mod.name
+    localized = localized_modifier_name(english)
+    if localized == english:
+        # Nothing to translate: leave the data untouched so opening a file in
+        # English does not mark it as modified.
+        return False
+
+    if not tag_modifier(mod, english):
+        return False
+
+    mod.name = localized
+    return True
+
+
+def localize_scene_modifier_names():
+    """Apply the current language to every ND modifier already in the file."""
+    changed = 0
+    for obj in bpy.data.objects:
+        for mod in obj.modifiers:
+            if adopt_modifier_name(mod):
+                changed += 1
+                continue
+            if not has_kind(mod):
+                continue
+            wanted = localized_modifier_name(nd_name(mod))
+            if mod.name != wanted:
+                mod.name = wanted
+                changed += 1
+    return changed
+
+
 def new_modifier(object, mod_name, mod_type, rectify=True):
     mod = object.modifiers.new(mod_name, mod_type)
 
